@@ -1,0 +1,44 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 开发指南
+
+## 代码规范
+- **类型注解**: 所有变量和函数参数必须包含完整的类型注解
+- **命名规范**: 遵循 Rust 官方命名约定（snake_case for variables and functions, PascalCase for types）
+- **错误处理**: 使用 `Result<T, E>` 类型进行错误处理，避免 `panic!`
+- **文档注释**: 公共 API 必须包含文档注释 (`///`)
+
+## 项目特定要求
+- **目标平台**: Windows 10 + WSL 环境
+- **Wallpaper Engine 集成**: 代码应该考虑与 Steam 上的 Wallpaper Engine 的兼容性
+- **轻量级设计**: 优先考虑性能和内存使用
+
+## WSL 开发注意事项
+- **路径处理**: 注意 Windows 路径和 Linux 路径的差异
+- **文件权限**: 确保在 WSL 环境中正确处理文件权限
+- **跨平台兼容**: 考虑代码在不同环境下的运行
+
+## 推荐的 Cargo 依赖
+```toml
+# 异步运行时
+tokio = { version = "1.0", features = ["full"] }
+
+# 序列化/反序列化
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# HTTP 客户端
+reqwest = { version = "0.11", features = ["json"] }
+
+# 错误处理
+anyhow = "1.0"
+thiserror = "1.0"
+
+# 日志
+log = "0.4"
+env_logger = "0.10"
+```
+

@@ -1,0 +1,54 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Wallpaper Engine 集成指南
+
+## Wallpaper Engine 概述
+Wallpaper Engine 是 Steam 上流行的动态壁纸应用，支持多种格式的壁纸文件。
+
+## 文件格式支持
+- **视频文件**: MP4, AVI, MOV, WMV
+- **图片文件**: JPG, PNG, GIF, BMP
+- **Web 壁纸**: HTML/CSS/JavaScript
+- **应用程序壁纸**: 原生应用程序
+
+## Steam Workshop 集成
+- **工作坊路径**: 通常位于 `steamapps/workshop/content/431960/`
+- **壁纸元数据**: 每个壁纸都有对应的 project.json 文件
+- **订阅状态**: 需要检测用户订阅的壁纸
+
+## 常见文件路径 (Windows)
+```
+# Steam 默认安装路径
+C:\Program Files (x86)\Steam\
+
+# Wallpaper Engine 安装路径
+C:\Program Files (x86)\Steam\steamapps\common\wallpaper_engine\
+
+# Workshop 内容路径
+C:\Program Files (x86)\Steam\steamapps\workshop\content\431960\
+```
+
+## WSL 路径映射
+在 WSL 环境中，Windows 路径需要转换：
+```
+C:\ -> /mnt/c/
+D:\ -> /mnt/d/
+E:\ -> /mnt/e/
+```
+
+## 推荐功能实现
+1. **壁纸浏览**: 扫描并显示已安装的壁纸
+2. **预览功能**: 生成壁纸缩略图
+3. **标签管理**: 支持壁纸分类和搜索
+4. **性能监控**: 显示壁纸的 CPU/GPU 使用情况
+5. **批量操作**: 支持批量启用/禁用壁纸
+
+## 安全注意事项
+- **权限检查**: 确保有足够权限访问 Steam 目录
+- **文件验证**: 验证壁纸文件的完整性
+- **路径安全**: 防止路径遍历攻击
+
+
