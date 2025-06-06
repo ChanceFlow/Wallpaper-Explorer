@@ -1,12 +1,12 @@
-slint::include_modules!();
+use Wallpaper_Explorer::App;
 
-fn main() -> Result<(), slint::PlatformError> {
-    // 创建主窗口实例
-    let main_window: MainWindow = MainWindow::new()?;
+fn main() -> Wallpaper_Explorer::Result<()> {
+    // 初始化日志记录
+    env_logger::init();
     
-    // 设置窗口属性
-    main_window.set_title("壁纸浏览器 - Wallpaper Explorer Alpha v0.1.0".into());
+    // 创建并运行应用程序
+    let app: App = App::new()?;
+    app.run()?;
     
-    // 运行应用程序主循环
-    main_window.run()
+    Ok(())
 }
