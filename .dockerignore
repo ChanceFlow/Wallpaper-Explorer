@@ -68,11 +68,11 @@ docker-compose*.yml
 *.dockerfile
 
 # 文档和说明
-README*.md
+# README*.md  # 注释掉，构建程序需要README文件
 docs/
 documentation/
-*.md
-LICENSE*
+# *.md  # 注释掉，构建程序需要LICENSE和README等md文件
+# LICENSE*  # 注释掉，安装程序需要许可证文件
 CHANGELOG*
 
 # 配置文件
