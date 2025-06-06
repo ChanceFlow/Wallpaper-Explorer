@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 
 # 项目信息
 PROJECT_NAME="Wallpaper Explorer"
-# VERSION="0.1.0"  # 移除硬编码版本
+# 版本号动态从 Cargo.toml 获取
 BUILD_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PLATFORMS_DIR="$BUILD_DIR/build/platforms"
 DIST_DIR="$BUILD_DIR/dist"

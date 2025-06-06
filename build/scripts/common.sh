@@ -151,38 +151,6 @@ get_project_name() {
     fi
 }
 
-# 检查 Rust 环境
-check_rust_env() {
-    check_command cargo || return 1
-    check_command rustc || return 1
-    
-    local rust_version=$(rustc --version | awk '{print $2}')
-    print_step "Rust 版本: $rust_version"
-    
-    return 0
-}
-
-# 添加 Rust 目标
-add_rust_target() {
-    local target=$1
-    print_step "添加 Rust 目标: $target"
-    rustup target add $target
-}
-
-# Cargo 构建
-cargo_build() {
-    local target=$1
-    local profile=${2:-release}
-    
-    print_step "构建目标: $target (profile: $profile)"
-    
-    if [ -n "$target" ]; then
-        cargo build --profile $profile --target $target
-    else
-        cargo build --profile $profile
-    fi
-}
-
 # 检查 Docker 环境
 check_docker_env() {
     check_command docker || return 1
@@ -196,44 +164,4 @@ check_docker_env() {
     print_step "Docker 版本: $docker_version"
     
     return 0
-}
-
-# 检查交叉编译工具链
-check_cross_compile_tools() {
-    local target=$1
-    
-    case $target in
-        "x86_64-pc-windows-gnu")
-            if ! check_command x86_64-w64-mingw32-gcc; then
-                print_error "MinGW-w64 工具链未安装"
-                print_step "Ubuntu/Debian: sudo apt install gcc-mingw-w64-x86-64"
-                print_step "macOS: brew install mingw-w64"
-                return 1
-            fi
-            ;;
-        "aarch64-unknown-linux-gnu")
-            if ! check_command aarch64-linux-gnu-gcc; then
-                print_error "ARM64 交叉编译工具链未安装"
-                print_step "Ubuntu/Debian: sudo apt install gcc-aarch64-linux-gnu"
-                return 1
-            fi
-            ;;
-    esac
-    
-    return 0
-}
-
-# 检查 macOS 代码签名环境
-check_macos_codesign() {
-    if [[ "$OSTYPE" != "darwin"* ]]; then
-        return 1
-    fi
-    
-    if security find-identity -v -p codesigning | grep -q "Developer ID Application"; then
-        print_step "找到代码签名证书"
-        return 0
-    else
-        print_warning "未找到代码签名证书"
-        return 1
-    fi
 } 

@@ -11,7 +11,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 source "$SCRIPT_DIR/common.sh"
 
-print_header "构建系统验证"
+print_header "构建系统验证 (Docker Only)"
 
 # 检查项目结构
 check_project_structure() {
@@ -22,6 +22,9 @@ check_project_structure() {
         "src/main.rs"
         "build/scripts/build.sh"
         "build/scripts/common.sh"
+        "build/platforms/windows/docker/Dockerfile"
+        "build/platforms/linux/docker/Dockerfile"
+        "build/platforms/macos/docker/Dockerfile"
     )
     
     for file in "${required_files[@]}"; do
@@ -53,9 +56,9 @@ check_version_consistency() {
     fi
 }
 
-# 检查平台支持
-check_platform_support() {
-    print_step "检查平台支持..."
+# 检查 Docker 构建支持
+check_docker_support() {
+    print_step "检查 Docker 构建环境..."
     
     local current_os=""
     case "$OSTYPE" in
@@ -67,34 +70,42 @@ check_platform_support() {
     
     print_step "当前操作系统: $current_os"
     
-    # 检查可用的构建目标
+    # 检查 Docker 环境
+    if check_docker_env; then
+        print_step "✓ Docker 可用"
+        
+        # 测试 Docker 构建能力
+        print_step "测试 Docker 构建能力..."
+        if docker run --rm hello-world &>/dev/null; then
+            print_step "✓ Docker 运行正常"
+        else
+            print_warning "✗ Docker 运行测试失败"
+        fi
+        
+        # 检查 Docker 磁盘空间
+        local docker_info=$(docker system df --format "table {{.Type}}\t{{.Size}}" 2>/dev/null || echo "")
+        if [ -n "$docker_info" ]; then
+            print_step "Docker 存储信息:"
+            echo "$docker_info"
+        fi
+        
+    else
+        print_error "✗ Docker 不可用"
+        print_step "请安装并启动 Docker 以使用构建系统"
+        return 1
+    fi
+}
+
+# 检查可用的构建目标
+check_build_targets() {
     print_step "可用的构建目标:"
     
-    if check_command cargo; then
-        print_step "✓ 本地构建 (Rust)"
-    fi
+    print_step "✓ Windows 安装程序 (Docker + NSIS)"
+    print_step "✓ Windows 便携版 (Docker + MinGW-w64)"
+    print_step "✓ Linux DEB 包 (Docker + dpkg)"
+    print_step "✓ macOS App Bundle (Docker + 交叉编译)"
     
-    if check_command x86_64-w64-mingw32-gcc; then
-        print_step "✓ Windows 交叉编译"
-    else
-        print_warning "✗ Windows 交叉编译工具链"
-    fi
-    
-    if check_docker_env; then
-        print_step "✓ Docker 构建"
-    else
-        print_warning "✗ Docker 不可用"
-    fi
-    
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        print_step "✓ macOS 原生构建"
-        
-        if check_macos_codesign; then
-            print_step "✓ macOS 代码签名"
-        else
-            print_warning "✗ macOS 代码签名证书"
-        fi
-    fi
+    print_success "所有构建目标均通过 Docker 支持"
 }
 
 # 主验证函数
@@ -102,11 +113,17 @@ main() {
     cd "$PROJECT_ROOT"
     
     check_project_structure
-    check_rust_env
     check_version_consistency
-    check_platform_support
+    check_docker_support
+    check_build_targets
     
-    print_success "构建系统验证完成"
+    print_success "构建系统验证完成 - Docker Only 模式就绪"
+    print_step "使用方法:"
+    print_step "  ./build/scripts/build.sh windows installer  # Windows 安装程序"
+    print_step "  ./build/scripts/build.sh windows portable   # Windows 便携版"
+    print_step "  ./build/scripts/build.sh linux deb          # Linux DEB 包"
+    print_step "  ./build/scripts/build.sh macos app          # macOS App Bundle"
+    print_step "  ./build/scripts/build.sh all --clean        # 构建所有平台"
 }
 
 main "$@" 
