@@ -1,0 +1,60 @@
+name: Build Windows App
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  build-windows:
+    name: Build Windows x64
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: wallpaper-explorer-v__VERSION__ # 应用版本号会自动替换__VERSION__
+          releaseName: 'Wallpaper Explorer v__VERSION__'
+          releaseBody: |
+            Windows版本壁纸浏览器应用
+            
+            ### 更新内容
+            - Windows x64 版本
+            - 支持壁纸浏览和管理
+            
+            ### 安装说明
+            下载对应的安装包并运行即可。
+          releaseDraft: false
+          prerelease: false
+          args: --target x86_64-pc-windows-msvc 
