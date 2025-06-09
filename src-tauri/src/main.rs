@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    we_tauri_lib::run()
+    wallpaper_explorer_lib::run()
 }
